@@ -22,6 +22,13 @@ public class BlockInteraction : MonoBehaviour
     public GameObject selection;
     public GameObject pickaxe;
     public int pickaxeUse = 0;
+    AudioSource audioSource;
+    public string deviceName;
+    public bool useMicrophone;
+    public AudioClip audioClip;
+    private bool canChange = true;
+    public AudioSource cube;
+    public AudioClip createCube;
     void Start()
     {
         type = new Block.BlockType[] { Block.BlockType.DIRT, Block.BlockType.STONE,Block.BlockType.DIAMOND };
@@ -34,18 +41,43 @@ public class BlockInteraction : MonoBehaviour
         rock.text = ""+numBlocks[Block.BlockType.STONE];
         diamond.text = ""+numBlocks[Block.BlockType.DIAMOND];
         selection.GetComponent<RectTransform>().anchoredPosition = new Vector2(61, -60);
+        audioSource = GetComponent<AudioSource>();
+        if (useMicrophone)
+        {
+            if (Microphone.devices.Length > 0)
+            {
+                deviceName = Microphone.devices[0];
+                audioSource.clip = Microphone.Start(deviceName, true, 10, AudioSettings.outputSampleRate);
+                print(AudioSettings.outputSampleRate);
+                while (Microphone.GetPosition(deviceName) < (AudioSettings.outputSampleRate / 1000) * 30) ;
+
+            }
+            else
+                useMicrophone = false;
+        }
+
+
+        if (!useMicrophone)
+        {
+            audioSource.clip = audioClip;
+        }
+
+        audioSource.loop = true;
+        audioSource.Play();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (AudioAnalysis.Whistle(audioSource)&& canChange)
         {
             pointer = (pointer + 1);
             pointer = pointer % type.Length;
             //blockType.text = blocks[pointer];
             SetSelection(type[pointer]);
+            canChange = false;
+            StartCoroutine(TimeOfChange());
         }
         if (Input.GetKeyDown(KeyCode.M) && numBlocks[Block.BlockType.STONE]>=4)
         {
@@ -125,15 +157,39 @@ public class BlockInteraction : MonoBehaviour
                         if (num > 0)
                         {
                             c.chunkdata[blockx, blocky, blockz].SetType(type[pointer]);
+                            cube.clip = createCube;
+                            cube.Play();
                             num--;
                             numBlocks[type[pointer]] = num;
                             SetNumOfBlocksText(type[pointer]);
                         }
                     }
-                    DestroyImmediate(c.goChunk.GetComponent<MeshFilter>());
-                    DestroyImmediate(c.goChunk.GetComponent<MeshRenderer>());
-                    DestroyImmediate(c.goChunk.GetComponent<MeshCollider>());
-                    c.DrawChunk();
+                    
+                   
+                    List<string> updates = new List<string>();
+                    updates.Add(chunkName);
+                    if (blockx == 0)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx - World.chunkSize, chunky, chunkz)));
+                    if(blockx==World.chunkSize-1)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx + World.chunkSize, chunky, chunkz)));
+                    if (blocky == 0)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx, chunky-World.chunkSize, chunkz)));
+                    if (blocky == World.chunkSize - 1)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx, chunky-World.chunkSize, chunkz)));
+                    if (blockz == 0)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx, chunky, chunkz-World.chunkSize)));
+                    if (blockz == World.chunkSize - 1)
+                        updates.Add(World.CreateChunkName(new Vector3(chunkx, chunky, chunkz+World.chunkSize)));
+                    foreach(string cname in updates)
+                    {
+                        if (World.chunkDict.TryGetValue(cname, out c))
+                        {
+                            DestroyImmediate(c.goChunk.GetComponent<MeshFilter>());
+                            DestroyImmediate(c.goChunk.GetComponent<MeshRenderer>());
+                            DestroyImmediate(c.goChunk.GetComponent<MeshCollider>());
+                            c.DrawChunk();
+                        }
+                    }
                 }
             }
         }
@@ -169,5 +225,16 @@ public class BlockInteraction : MonoBehaviour
                 selection.GetComponent<RectTransform>().anchoredPosition = new Vector2(61, -192);
                 break;
         }
+    }
+
+    IEnumerator TimeOfChange()
+    {
+        yield return new WaitForSeconds(1);
+        canChange = true;
+    }
+
+    public int NumOfblocks(Block.BlockType type)
+    {
+        return numBlocks[type];
     }
 }

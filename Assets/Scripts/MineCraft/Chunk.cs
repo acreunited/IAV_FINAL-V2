@@ -14,13 +14,22 @@ public class Chunk
     public enum ChunkStatus {DRAW,DONE};
     public ChunkStatus status;
 
-    public Chunk(Vector3 pos,Material material)
+    public Chunk(Vector3 pos,Material material,bool isHidden)
     {
         goChunk = new GameObject(World.CreateChunkName(pos));
         goChunk.transform.position = pos;
         this.material = material;
-        BuildChunk();
+        if (isHidden)
+        {
+            BuildChunkHidden();
+        }
+        else
+        {
+            BuildChunk();
+        }
     }
+
+   
     void BuildChunk()
     {
         chunkdata = new Block[World.chunkSize, World.chunkSize, World.chunkSize];
@@ -65,6 +74,58 @@ public class Chunk
                     }
 
                     
+                }
+
+            }
+
+        }
+        status = ChunkStatus.DRAW;
+    }
+    void BuildChunkHidden()
+    {
+        chunkdata = new Block[World.chunkSize, World.chunkSize, World.chunkSize];
+        for (int z = 0; z < World.chunkSize; z++)
+        {
+            for (int y = 0; y < World.chunkSize; y++)
+            {
+                for (int x = 0; x < World.chunkSize; x++)
+                {
+                    Vector3 pos = new Vector3(x, y, z);
+
+                    int worldX = (int)goChunk.transform.position.x + x;
+                    int worldY = (int)goChunk.transform.position.y + y;
+                    int worldZ = (int)goChunk.transform.position.z + z;
+
+                    int h = Utils.GenerateHeightRaandom(worldX, worldZ);
+                    int hs = Utils.GenerateStoneHeightRandom(worldX, worldZ);
+                    if (worldY <= hs)
+                    {
+                        if (Utils.fBM3DRandom(worldX, worldY, worldZ, 1, 0.5f) < 0.495f)
+                        {
+                            {
+                                chunkdata[x, y, z] = new Block(Block.BlockType.ORANGE, pos, this, material);
+                            }
+         
+                        }
+                        else
+                        {
+                            chunkdata[x, y, z] = new Block(Block.BlockType.AIR, pos, this, material);
+                        }
+                    }
+                    else if (worldY == h)
+                    {
+                        chunkdata[x, y, z] = new Block(Block.BlockType.BLUE, pos, this, material);
+                    }
+                    else if (worldY < h)
+                    {
+                        chunkdata[x, y, z] = new Block(Block.BlockType.PURPLE, pos, this, material);
+                    }
+                    else
+                    {
+                        chunkdata[x, y, z] = new Block(Block.BlockType.AIR, pos, this, material);
+                    }
+
+
                 }
 
             }

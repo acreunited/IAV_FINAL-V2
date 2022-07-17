@@ -5,6 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pickaxe
+  - Wall
+  - Sheep
+  - Cow
+  - Chicken
+  - Pig
+  - X_Target
+  - O_Target
+  - X
+  - O
   layers:
   - Default
   - TransparentFX

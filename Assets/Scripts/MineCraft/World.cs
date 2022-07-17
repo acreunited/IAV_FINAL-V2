@@ -14,10 +14,10 @@ public class World : MonoBehaviour {
     public static List<string> toRemove = new List<string>();
     Vector3 lastBuildPos;
     bool drawing;
-    public static float cooldown = 1.5f;
-    public static float lastCube;
-    public static bool canCreate = true;
+    
     [SerializeField] private AudioSource createCubeEffect;
+    public bool isHidden=false;
+    
 
     public static string CreateChunkName(Vector3 v) {
         return (int)v.x + " " + (int)v.y + " " + (int)v.z;
@@ -53,7 +53,7 @@ public class World : MonoBehaviour {
         string name = CreateChunkName(chunkPos);
         Chunk c;
         if (!chunkDict.TryGetValue(name, out c)) {
-            c = new Chunk(chunkPos, material);
+            c = new Chunk(chunkPos, material,isHidden);
             c.goChunk.transform.parent = this.transform;
             chunkDict.TryAdd(c.goChunk.name, c);
         }
@@ -120,83 +120,7 @@ public class World : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
-        if (Input.GetKey(KeyCode.E)&& canCreate) {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x,player.transform.position.y+1,player.transform.position.z+1);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-              
-            
-        }
-        else if (Input.GetKey(KeyCode.R) && canCreate)
-        {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x, player.transform.position.y+1, player.transform.position.z - 1);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-
-
-        }
-        else if (Input.GetKey(KeyCode.T) && canCreate)
-        {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-
-
-        }
-        else if (Input.GetKey(KeyCode.Y) && canCreate)
-        {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x, player.transform.position.y+3, player.transform.position.z);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-
-
-        }
-        else if (Input.GetKey(KeyCode.U) && canCreate)
-        {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x+1, player.transform.position.y + 1, player.transform.position.z);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-
-
-        }
-        else if (Input.GetKey(KeyCode.I) && canCreate)
-        {
-            canCreate = false;
-            createCubeEffect.Play();
-            Chunk c = new Chunk(player.transform.position, material);
-            c.goChunk.AddComponent<MeshCollider>();
-            Vector3 pos = new Vector3(player.transform.position.x - 1, player.transform.position.y + 1, player.transform.position.z);
-            Block block = new Block(Block.BlockType.GOLD, pos, c, material);
-            block.DrawOnClick();
-            this.StartCoroutine(TimeOfCube());
-
-
-        }
+   
 
         Vector3 movement = player.transform.position - lastBuildPos;
         if (movement.magnitude > chunkSize) {
@@ -209,10 +133,5 @@ public class World : MonoBehaviour {
         }
     }
 
-    IEnumerator TimeOfCube()
-    {
-        yield return new WaitForSeconds(1);
-        canCreate = true;
-
-    }
+    
 }

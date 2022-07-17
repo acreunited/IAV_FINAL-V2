@@ -6,7 +6,7 @@ public class Block
 {
     Material material;
     enum Cubeside { BOTTOM, TOP, LEFT, RIGHT, FRONT, BACK };
-    public enum BlockType { GRASS, DIRT, STONE,DIAMOND,GOLD,AIR};
+    public enum BlockType { GRASS, DIRT, STONE,DIAMOND,GOLD,BLUE,PURPLE,ORANGE,AIR};
 
     BlockType bType;
 
@@ -22,6 +22,9 @@ public class Block
     static Vector2 Stone_LBC = new Vector2(0f, 14f) / 16;
     static Vector2 Diamond_LBC = new Vector2(2f, 12f) / 16;
     static Vector2 Gold_LBC = new Vector2(0f, 13f) / 16;
+    static Vector2 Blue_LBC= new Vector2(0f, 6f) / 16;
+    static Vector2 Purple_LBC= new Vector2(1f, 3f) / 16;
+    static Vector2 Orange_LBC = new Vector2(2f, 2f) / 16;
 
     Vector2[,] blockUvs =
     {
@@ -36,7 +39,13 @@ public class Block
         /*DIAMOND*/  {Diamond_LBC,Diamond_LBC+ new Vector2(1f,0f)/16,
             Diamond_LBC+new Vector2(0f,1f)/16,Diamond_LBC+new Vector2(1f,1f)/16},
         /*GOLD*/ {Gold_LBC,Gold_LBC+ new Vector2(1f,0f)/16,
-            Gold_LBC+new Vector2(0f,1f)/16,Gold_LBC+new Vector2(1f,1f)/16}
+            Gold_LBC+new Vector2(0f,1f)/16,Gold_LBC+new Vector2(1f,1f)/16},
+        /*BLUE*/ {Blue_LBC,Blue_LBC+ new Vector2(1f,0f)/16,
+            Blue_LBC+new Vector2(0f,1f)/16,Blue_LBC+new Vector2(1f,1f)/16},
+        /*Purple*/ {Purple_LBC,Purple_LBC+ new Vector2(1f,0f)/16,
+            Purple_LBC+new Vector2(0f,1f)/16,Purple_LBC+new Vector2(1f,1f)/16},
+        /*Orange*/ {Orange_LBC,Orange_LBC+ new Vector2(1f,0f)/16,
+            Orange_LBC+new Vector2(0f,1f)/16,Orange_LBC+new Vector2(1f,1f)/16}
     };
 
     public Block(BlockType bType, Vector3 pos, Chunk owner, Material material)
